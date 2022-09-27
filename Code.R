@@ -14,9 +14,15 @@ library(e1071)
 library(nnet)
 library(caret)
 library(mlbench)
+library(kernlab)
+
+## Parallel Processing
+library(doParallel)
+cl <- makePSOCKcluster(3)
+registerDoParallel(cl)
 
 ## Data
-data <- read.csv("TCGA_t_RFE.csv", header = TRUE, row.names = 1)
+data <- read.csv("TCGA_t_RFE.csv", header = TRUE)
 
 ## Subsets if We want
 subsets <- c(1:10)
@@ -38,6 +44,9 @@ control <- rfeControl(functions=caretFuncs,
                  sizes = 2:(length(data)-1),  
                  rfeControl = control,
                  method = "svmRadial",
-                 metric = "accuracy",
+                 metric = "Accuracy",
                  trControl = trainctrl)
+
+## stop the cluster ##
+stopCluster(cl)
 
