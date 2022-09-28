@@ -18,18 +18,21 @@ library(kernlab)
 
 ## Parallel Processing
 library(doParallel)
-cl <- makePSOCKcluster(3)
+cl <- makePSOCKcluster(8)
 registerDoParallel(cl)
 
+library(doMC)
+registerDoMC(cores = 2)
+
 ## Data
-data <- read.csv("TCGA_t_RFE.csv", header = TRUE)
+data <- read.csv("TCGA_T_RFE.csv", header = TRUE)
 
 ## Subsets if We want
 subsets <- c(1:10)
 
 ## Control parameters
 control <- rfeControl(functions=caretFuncs, 
-                   method = "cv",
+                   method = "repeatedcv",
                    repeats =5, number = 10,
                    returnResamp="final", verbose = TRUE)
                    
@@ -44,9 +47,11 @@ control <- rfeControl(functions=caretFuncs,
                  sizes = 2:(length(data)-1),  
                  rfeControl = control,
                  method = "svmRadial",
-                 metric = "Accuracy",
+                 metric = "ROC",
                  trControl = trainctrl)
 
 ## stop the cluster ##
 stopCluster(cl)
+
+
 
